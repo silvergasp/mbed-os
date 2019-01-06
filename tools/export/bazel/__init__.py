@@ -77,8 +77,6 @@ class Bazel(Exporter):
         cc_source_files = self.resources.s_sources + \
             self.resources.c_sources + self.resources.cpp_sources
 
-        cc_copts = self.resources.
-
         libraries = [self.prepare_lib(basename(lib)) for lib
                      in self.libraries]
         sys_libs = [self.prepare_sys_lib(lib) for lib
