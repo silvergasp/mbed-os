@@ -1,0 +1,31 @@
+cc_library(
+    name="mbed_os",
+    srcs = [
+        {% for src_file in cc_src_files %}"{{src_file}}",
+        {% endfor %}
+        "{{linker_script}}",
+    ],
+    hdrs = glob(["**/*.h]),
+    includes = [
+        {% for path in include_paths %}"{{path}}",
+        {% endfor %}
+    ],
+    link_static = True,
+    strip_include_prefix = ".", # This can be removed once gcc_arm_none_eabi supports system includes for c++ headers
+    copts = [
+        {% for flag in asm_flags%}"{{flag}}",
+        {% endfor %}
+        {% for flag in c_flags%}"{{flag}}",
+        {% endfor %}
+        {% for flag in cxx_flags%}"{{flag}}",
+        {% endfor %}
+    ],
+    linkopts = [
+        {% for flag in ld_flags%}"{{flag}}",
+        {% endfor %}
+        {% for flag in ld_sys_libs%}"{{flag}}",
+        {% endfor %}
+    ]
+
+
+)

@@ -1,0 +1,93 @@
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+git_repository(
+    name="bazel_arm_none",
+    remote="https://github.com/silvergasp/bazel_arm_none.git",
+    commit = "67a38d42af16eb5b1090edc621f6bbe46b3a6ad7",
+)
+
+http_archive(
+  name = "toolchain_gcc_arm_none",
+  strip_prefix = "gcc-arm-none-eabi-7-2018-q2-update",
+  urls = ["https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/7-2018q2/gcc-arm-none-eabi-7-2018-q2-update-linux.tar.bz2"],
+  sha256 = "bb17109f0ee697254a5d4ae6e5e01440e3ea8f0277f2e8169bf95d07c7d5fe69",
+  build_file_content = 
+  """
+package(default_visibility = ["//visibility:public"])
+filegroup(
+    name = "gcc",
+    srcs = [
+        "bin/arm-none-eabi-gcc",
+    ],
+)
+filegroup(
+    name = "g++",
+    srcs = [
+        "bin/arm-none-eabi-g++",
+    ],
+)
+filegroup(
+    name = "ar",
+    srcs = [
+        "bin/arm-none-eabi-ar",
+    ],
+)
+filegroup(
+    name = "ld",
+    srcs = [
+        "bin/arm-none-eabi-ld",
+    ],
+)
+filegroup(
+    name = "nm",
+    srcs = [
+        "bin/arm-none-eabi-nm",
+    ],
+)
+filegroup(
+    name = "objcopy",
+    srcs = [
+        "bin/arm-none-eabi-objcopy",
+    ],
+)
+filegroup(
+    name = "objdump",
+    srcs = [
+        "bin/arm-none-eabi-objdump",
+    ],
+)
+filegroup(
+    name = "strip",
+    srcs = [
+        "bin/arm-none-eabi-strip",
+    ],
+)
+filegroup(
+    name = "as",
+    srcs = [
+        "bin/arm-none-eabi-as",
+    ],
+)
+filegroup(
+    name = "compiler_pieces",
+    srcs = glob([
+        "arm-none-eabi/**",
+        "lib/gcc/arm-none-eabi/**",
+    ]),
+)
+filegroup(
+    name = "compiler_components",
+    srcs = [
+        ":ar",
+        ":as",
+        ":gcc",
+        ":ld",
+        ":nm",
+        ":objcopy",
+        ":objdump",
+        ":strip",
+    ],
+)
+""",
+)

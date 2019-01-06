@@ -31,7 +31,7 @@ from ..build_api import prepare_toolchain
 from ..targets import TARGET_NAMES
 from . import (lpcxpresso, iar, makefile, embitz, coide, kds, simplicity,
                atmelstudio, mcuxpresso, sw4stm32, e2studio, zip, cmsis, uvision,
-               cdt, vscode, gnuarmeclipse, qtcreator, cmake, nb, cces, codeblocks)
+               cdt, vscode, gnuarmeclipse, qtcreator, cmake, nb, cces, codeblocks, bazel)
 
 EXPORTERS = {
     u'uvision6': uvision.UvisionArmc6,
@@ -41,22 +41,23 @@ EXPORTERS = {
     u'make_armc6': makefile.Armc6,
     u'make_iar': makefile.IAR,
     u'iar': iar.IAR,
-    u'embitz' : embitz.EmBitz,
-    u'sw4stm32'    : sw4stm32.Sw4STM32,
-    u'e2studio' : e2studio.E2Studio,
-    u'eclipse_gcc_arm'  : cdt.EclipseGcc,
-    u'eclipse_iar'      : cdt.EclipseIAR,
-    u'eclipse_armc5'    : cdt.EclipseArmc5,
+    u'embitz': embitz.EmBitz,
+    u'sw4stm32': sw4stm32.Sw4STM32,
+    u'e2studio': e2studio.E2Studio,
+    u'eclipse_gcc_arm': cdt.EclipseGcc,
+    u'eclipse_iar': cdt.EclipseIAR,
+    u'eclipse_armc5': cdt.EclipseArmc5,
     u'gnuarmeclipse': gnuarmeclipse.GNUARMEclipse,
     u'mcuxpresso': mcuxpresso.MCUXpresso,
     u'netbeans':     nb.GNUARMNetbeans,
     u'qtcreator': qtcreator.QtCreator,
-    u'vscode_gcc_arm' : vscode.VSCodeGcc,
-    u'vscode_iar' : vscode.VSCodeIAR,
-    u'vscode_armc5' : vscode.VSCodeArmc5,
+    u'vscode_gcc_arm': vscode.VSCodeGcc,
+    u'vscode_iar': vscode.VSCodeIAR,
+    u'vscode_armc5': vscode.VSCodeArmc5,
     u'cmake_gcc_arm': cmake.GccArm,
-    u'cces' : cces.CCES,
-    u'codeblocks': codeblocks.CodeBlocks
+    u'cces': cces.CCES,
+    u'codeblocks': codeblocks.CodeBlocks,
+    u'bazel': bazel.Bazel
 }
 
 ERROR_MESSAGE_UNSUPPORTED_TOOLCHAIN = """
@@ -67,6 +68,7 @@ Please refer to <a href='/handbook/Exporting-to-offline-toolchains' target='_bla
 ERROR_MESSAGE_NOT_EXPORT_LIBS = """
 To export this project please <a href='http://mbed.org/compiler/?import=http://mbed.org/users/mbed_official/code/mbed-export/k&mode=lib' target='_blank'>import the export version of the mbed library</a>.
 """
+
 
 def mcu_ide_list():
     """Shows list of exportable ides
@@ -87,7 +89,8 @@ def mcu_ide_matrix(verbose_html=False):
     from prettytable import PrettyTable, HEADER
 
     # All tests status table print
-    table_printer = PrettyTable(["Platform"] + supported_ides, junction_char="|", hrules=HEADER)
+    table_printer = PrettyTable(
+        ["Platform"] + supported_ides, junction_char="|", hrules=HEADER)
     # Align table
     for col in supported_ides:
         table_printer.align[col] = "c"
@@ -113,13 +116,13 @@ def mcu_ide_matrix(verbose_html=False):
     else:
         result = table_printer.get_string()
     result += "\n\n"
-    result += "Total IDEs: %d\n"% (len(supported_ides))
+    result += "Total IDEs: %d\n" % (len(supported_ides))
     if verbose_html:
         result += "<br>"
-    result += "Total platforms: %d\n"% (len(TARGET_NAMES))
+    result += "Total platforms: %d\n" % (len(TARGET_NAMES))
     if verbose_html:
         result += "<br>"
-    result += "Total permutations: %d"% (perm_counter)
+    result += "Total permutations: %d" % (perm_counter)
     if verbose_html:
         result = result.replace("&amp;", "&")
     return result
@@ -176,6 +179,7 @@ def _inner_zip_export(resources, prj_files, inc_repos):
                     file_dest = join(dest, relpath(file_source, source))
                     to_zip.append(FileRef(file_dest, file_source))
     return to_zip
+
 
 def zip_export(file_name, prefix, resources, project_files, inc_repos, notify):
     """Create a zip file from an exported project.
@@ -270,7 +274,8 @@ def export_project(src_paths, export_path, target, ide, libraries_paths=None,
     toolchain.config.load_resources(resources)
     toolchain.set_config_data(toolchain.config.get_config_data())
     config_header = toolchain.get_config_header()
-    resources.add_file_ref(FileType.HEADER, basename(config_header), config_header)
+    resources.add_file_ref(FileType.HEADER, basename(
+        config_header), config_header)
 
     # Change linker script if specified
     if linker_script is not None:
